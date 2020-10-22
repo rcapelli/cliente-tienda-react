@@ -5,7 +5,7 @@ import { FirebaseContext } from '../../firebase'
 import Plato from '../ui/plato'
 
 
-const Menu = () => {
+const Productos = () => {
 
     // defino state
     const [platos, guardarPlatos] = useState([]);
@@ -13,12 +13,12 @@ const Menu = () => {
     const { firebase } = useContext(FirebaseContext);
 
     // consultar base de datos al cargar
-    /*useEffect(() => {
+    useEffect(() => {
         const obtenerPlatos = () => {
            firebase.db.collection("productos").onSnapshot(handleSnapshot)
         }
         obtenerPlatos();
-    }, []);*/
+    }, []);
 
 
     // Snapshot para utilizar el realtime database
@@ -39,13 +39,9 @@ const Menu = () => {
 
     return ( 
         <>
-            <h1 className="text-3xl font-light mb-4">Menu</h1>
+            <h1 className="text-3xl font-light mb-4">Agregar Producto</h1>
             <Link to="/nuevoproducto" className="bg-blue-800 hover:bg-blue-700 inline-block mb-5 p-2 text-white uppercase">
                 Agregar producto
-            </Link>
-
-            <Link to="/nuevacategoria" className="bg-blue-800 hover:bg-blue-700 inline-block mb-5 p-2 ml-5 text-white uppercase">
-                Agregar categoría
             </Link>
 
             {platos.map( plato => (
@@ -58,4 +54,4 @@ const Menu = () => {
      );
 }
  
-export default Menu;
+export default Productos;

@@ -4,8 +4,11 @@ import { Routes, Route } from 'react-router';
 import firebase, { FirebaseContext }  from './firebase'
 import Ordenes from './components/paginas/Ordenes.js'
 import Menu from './components/paginas/Menu.js'
-import NuevoPlato from './components/paginas/NuevoPlato.js'
 import Sidebar from './components/ui/sidebar.js'
+import NuevoProducto from './components/paginas/NuevoProducto.js';
+import NuevaCategoria from './components/paginas/NuevaCategoria';
+import Productos from './components/paginas/Productos';
+import Categorias from './components/paginas/Categorias';
 
 
 function App() {
@@ -21,7 +24,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Ordenes />} />
           <Route path="/menu" element={<Menu />} />
-          <Route path="/nuevoplato" element={<NuevoPlato />} />
+          <Route path="/productos" element={<Productos />} />
+          <Route path="/categorias" element={<Categorias />} />
+          <Route path="/nuevoproducto" element={<NuevoProducto />} />
+          <Route path="/nuevacategoria" element={<NuevaCategoria />} />
         </Routes>
       </div>
     </div>

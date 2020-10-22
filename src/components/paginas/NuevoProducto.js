@@ -3,65 +3,93 @@ import FileUploader from 'react-firebase-file-uploader';
 import backendUrl from '../../utils/backendUrl'
 import { FirebaseContext } from '../../firebase';
 
-const NuevoPlato = () => {
+const NuevoProducto = () => {
 
     const { firebase } = useContext(FirebaseContext);
     const [nombre, setNombre] = useState("");
     const [precio, setPrecio] = useState("");
     const [descripcion, setDescripcion] = useState("");
     const [categoria, setCategoria] = useState("");
-    const [existencia, setExistencia] = useState("");
-    const [image, setImage] = useState("");
-    
-    /*const guardarDatos = (e) => {
-        
-        login()
-        
-        e.preventDefault()
-        //e.target.reset()
-        //setNombre('')
-        //setDescripcion('')
-    }*/
+    const [image, setUrl] = useState("");
+    const [progreso, guardarProgreso] = useState("");
+    const [subiendo, guardarSubiendo] = useState("");
 
-    const login = async () => {
-        if(!nombre || !descripcion || !precio || !categoria){
+    
+
+    const submit = async (inputs) => {
+        if(!nombre || !descripcion || !precio || !categoria || !image){
             console.log("ERROR todos los campos son obligatorios")  
         }
         else{
-            setExistencia(true)
-            setImage("asdasd")
             const url = backendUrl+"/products/new"
             await fetch(url, {
                 method:"POST",
                 headers: {
-                Accept: 'application/json',
+                'Accept': 'application/json',
                 'Content-Type': 'application/json'
                 },
-                mode: 'no-cors',
                 body: JSON.stringify({
-                categoria : categoria,
-                descripcion : descripcion,
-                nombre : nombre,
-                precio : precio,
-                existencia : existencia,
-                image : image,
+                    precio : precio,
+                    nombre : nombre,
+                    descripcion : descripcion,
+                    categoria : categoria,
+                    url : image
                 })
             })
         .catch((e)=>{
           console.log(e)
         })
+        console.log("el precio es: "+precio+". El nombre es: "+nombre+" y su descripcion: "+descripcion)
+        inputs.preventDefault()
+        inputs.target.reset()
+        setNombre('')
+        setDescripcion('')
+        setPrecio('')
+        setCategoria('')
+        setUrl('')
       }
     }
+
+        //manejo storage imagenes
+        const handleUploadStart = () => {
+            guardarProgreso(0);
+            guardarSubiendo(true);
+        }
+    
+        const handleUploadError = error => {
+            guardarSubiendo(false);
+            console.log(error);
+        }
+    
+        const handleUploadSuccess = async nombre => {
+            guardarProgreso(100);
+            guardarSubiendo(false);
+    
+            //almacenar url
+            const url = await firebase
+                            .storage
+                            .ref("productos")
+                            .child(nombre)
+                            .getDownloadURL();
+    
+            console.log(url);
+            setUrl(url);
+        }
+    
+        const handleProgress = progreso => {
+            guardarProgreso(progreso);
+            console.log(progreso);
+        }
 
     //return (
         return ( 
             <>
-                <h1 className="text-3xl font-light mb-4">Nuevo Plato</h1>
+                <h1 className="text-3xl font-light mb-4">Nuevo Producto</h1>
     
                 <div className="flex justify-center mt-10">
                     <div className="w-full max-w-3xl">
                         
-                        <form onSubmit={login}>
+                        <form onSubmit={submit}>
                             <div className="mb-4">
                                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="nombre">Nombre: </label>
                                 <input 
@@ -99,36 +127,53 @@ const NuevoPlato = () => {
                                         onChange={ (e) => setPrecio(e.target.value) }
                                 />
                             </div>
+                            <div className="mb-4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="categoria">Categoria: </label>
+                            <select
+                            className="shadow appearance-none border 
+                                    rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    id="categoria"
+                                    name="categoria"
+                                    onChange={(e) => setCategoria(e.target.value)}>
+                                        <option value="">--Seleccione--</option>
+                                        <option value="desayuno">Desayuno</option>
+                                        <option value="platos">Platos</option>
+                                        <option value="promocion">Promociones</option>
+                                        <option value="bebida">Bebida</option>
+                                        <option value="postre">Postre</option>
+                                        <option value="ensalada">Ensalada</option>
+                            </select>
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="image">Imagen: </label>
+                            <FileUploader
+                                accept="image/*"
+                                id="image"
+                                name="image"
+                                randomizeFilename
+                                storageRef={firebase.storage.ref("productos")}
+                                onUploadStart={handleUploadStart}
+                                onUploadError={handleUploadError}
+                                onUploadSuccess={handleUploadSuccess}
+                                onProgress={handleProgress}
+                            />
+                        </div>
+                            { subiendo && (
+                                <div className="h-8 relative w-full border">
+                                    <div className="bg-green-500 absolute left-0 top-0 text-white px-2 text-sm h-8 flex items-center" style={{width: `${progreso}%`}}>
+                                        { progreso } %
+                                    </div>
+                                </div>
+                            ) }
+
+                            { image && (
+                                <p className="bg-green-500 text-white p-3 text-center my-5">
+                                    La imagen se subió correctamente
+                                </p>
+                            )}
                            
     
-                            <div className="mb-4">
-                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="categoria">Categoria: </label>
-                                <select
-                                className="shadow appearance-none border 
-                                        rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        id="categoria"
-                                        name="categoria"
-                                        onChange={ (e) => setCategoria(e.target.value) }>
-                                            <option value="">--Seleccione--</option>
-                                            <option value="desayuno">Desayuno</option>
-                                            <option value="platos">Platos</option>
-                                            <option value="promocion">Promociones</option>
-                                            <option value="bebida">Bebida</option>
-                                            <option value="postre">Postre</option>
-                                            <option value="ensalada">Ensalada</option>
-                                </select>
-                            </div>
-    
-                            <div className="mb-4">
-                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="image">Imagen: </label>
-                                <FileUploader
-                                    accept="image/*"
-                                    id="image"
-                                    name="image"
-                                    randomizeFilename
-                                    storageRef={firebase.storage.ref("productos")}
-                                />
-                            </div>
                             <input 
                                 type="submit"
                                 className="bg-gray-800 hover:bg-gray-900 w-full mt-5 p-2 text-white uppercase"
@@ -160,4 +205,4 @@ const NuevoPlato = () => {
     //)
 }
 
-export default NuevoPlato
+export default NuevoProducto
