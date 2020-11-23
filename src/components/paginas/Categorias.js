@@ -1,57 +1,56 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React from 'react';
 import {Link} from 'react-router-dom';
-import { FirebaseContext } from '../../firebase'
+import backendUrl from '../../utils/backendUrl'
 
-import Plato from '../ui/plato'
-
-
-const Categorias = () => {
-
-    // defino state
-    const [platos, guardarPlatos] = useState([]);
-    
-    const { firebase } = useContext(FirebaseContext);
-
-    // consultar base de datos al cargar
-    useEffect(() => {
-        const obtenerPlatos = () => {
-           firebase.db.collection("productos").onSnapshot(handleSnapshot)
-        }
-        obtenerPlatos();
-    }, []);
-
-
-    // Snapshot para utilizar el realtime database
-    function handleSnapshot(snapshot){
-        const platos = snapshot.docs.map(doc => {
-            return {
-                id: doc.id,
-                ...doc.data()
-            }
-        });
-
-        //guardo resultados en state
-        guardarPlatos(platos);
+class Categorias extends React.Component{
+    constructor(props){
+      super(props);
+      this.state = {
+        categorias: []
+      };
     }
-
-
-
-
-    return ( 
-        <>
+    logCategorias = async () => {
+      var returnCategorias
+      const url = backendUrl + "/categorias/"
+        await fetch(url, {
+          method: "GET",
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(function (response) {
+            return response.json()
+          })
+          .then(function (response){
+            console.log(response)
+            returnCategorias = response
+          })
+          return returnCategorias
+    }
+  
+    async componentDidMount(){
+      var listado = await this.logCategorias() 
+      this.setState({categorias: listado})
+    }
+  
+      render(){
+        const {categorias} = this.state
+        return(
+            <>
             <h1 className="text-3xl font-light mb-4">Categorías</h1>
             <Link to="/nuevacategoria" className="bg-blue-800 hover:bg-blue-700 inline-block mb-5 p-2 text-white uppercase">
                 Agregar categoría
             </Link>
-
-            {platos.map( plato => (
-                <Plato 
-                    key={plato.id}
-                    plato={plato}
-                />
-            ))}
-        </>
-     );
+            <h2 className="text-2xl font-light mb-4"><u>Listado de categorías</u></h2>
+            <ul>
+                {categorias.map(categoria => {
+                return (<li>{categoria.categoria}</li>)
+                })}
+            </ul>
+          </>
+        )
+      }
 }
  
 export default Categorias;

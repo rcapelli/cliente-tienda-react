@@ -19,7 +19,7 @@ const NuevaCategoria = () => {
                 'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    nombre : nombre,
+                    categoria : nombre,
                     descripcion : descripcion
                 })
             })

@@ -2,6 +2,7 @@ import React , {useState, useContext} from 'react';
 import FileUploader from 'react-firebase-file-uploader'; 
 import backendUrl from '../../utils/backendUrl'
 import { FirebaseContext } from '../../firebase';
+import Categoria from '../paginas/Categoria.js';
 
 const NuevoProducto = () => {
 
@@ -13,7 +14,6 @@ const NuevoProducto = () => {
     const [image, setUrl] = useState("");
     const [progreso, guardarProgreso] = useState("");
     const [subiendo, guardarSubiendo] = useState("");
-
     
 
     const submit = async (inputs) => {
@@ -41,7 +41,7 @@ const NuevoProducto = () => {
         })
         console.log("el precio es: "+precio+". El nombre es: "+nombre+" y su descripcion: "+descripcion)
         inputs.preventDefault()
-        inputs.target.reset()
+        //inputs.target.reset()
         setNombre('')
         setDescripcion('')
         setPrecio('')
@@ -136,15 +136,10 @@ const NuevoProducto = () => {
                                     name="categoria"
                                     onChange={(e) => setCategoria(e.target.value)}>
                                         <option value="">--Seleccione--</option>
-                                        <option value="desayuno">Desayuno</option>
-                                        <option value="platos">Platos</option>
-                                        <option value="promocion">Promociones</option>
-                                        <option value="bebida">Bebida</option>
-                                        <option value="postre">Postre</option>
-                                        <option value="ensalada">Ensalada</option>
+                                        <Categoria/>
                             </select>
                         </div>
-
+                        
                         <div className="mb-4">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="image">Imagen: </label>
                             <FileUploader
@@ -174,12 +169,13 @@ const NuevoProducto = () => {
                             )}
                            
     
-                            <input 
+                           <input 
                                 type="submit"
                                 className="bg-gray-800 hover:bg-gray-900 w-full mt-5 p-2 text-white uppercase"
                                 value="Agregar"
-                            />
+                            />    
                         </form>
+                        
                     </div>
                 </div>
             </>
